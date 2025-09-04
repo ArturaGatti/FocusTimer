@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusTimer - Повысьте свою продуктивность</title>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #166088;
+            --accent: #4cb1a7;
+            --background: #f8f9fa;
+            --text: #333;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .timer-display {
+            font-size: 80px;
+            font-weight: bold;
+            margin: 30px 0;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 50px;
+        }
+        
+        .mode-btn {
+            padding: 10px 20px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .mode-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .stats {
+            margin-top: 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            width: 100%;
+        }
+        
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .settings-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(45deg);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 100px auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            color: white;
+        }
+        
+        .modal h3 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .modal input[type="number"] {
+            width: 60px;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .modal label {
+            display: block;
+            margin: 10px 0;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+            transition: width 1s linear;
+        }
+
+        .stats-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+        }
+
+        .stats-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .stats-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .stats-chart {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        #chart-container {
+            height: 150px;
+            margin-top: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 10px;
+        }
+
+        .chart-bar {
+            background: var(--accent);
+            width: 20px;
+            margin: 0 5px;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .game-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        body.light-theme {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+        }
+
+        body.light-theme .container {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+
+        body.light-theme button {
+            background: rgba(74, 111, 165, 0.8);
+            color: white;
+        }
+
+        body.light-theme .stats,
+        body.light-theme .stat-item,
+        body.light-theme .stats-chart {
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        .theme-switcher {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-switcher:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(180deg);
+        }
+
+        .update-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--accent);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .update-notification button {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>FocusTimer</h1>
+        <p>Повысьте свою продуктивность с помощью техники Pomodoro</p>
+    </header>
+    
+    <div class="container">
+        <div class="mode-selector">
+            <button class="mode-btn active" id="work-mode">Работа (25:00)</button>
+            <button class="mode-btn" id="break-mode">Перерыв (5:00)</button>
+        </div>
+        
+        <div class="timer-display" id="timer">25:00</div>
+        
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        
+        <div class="controls">
+            <button id="start-btn">Старт</button>
+            <button id="pause-btn" disabled>Пауза</button>
+            <button id="reset-btn">Сброс</button>
+        </div>
+        
+        <div class="stats">
+            <h3>Сегодня</h3>
+            <p>Завершено помодоро: <span id="completed-count">0</span></p>
+        </div>
+    </div>
+    
+    <div class="settings-btn" id="settings-btn">⚙️</div>
+    <div class="stats-btn" id="stats-btn">📊</div>
+    <div class="theme-switcher" id="theme-btn">🌙</div>
+    
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <h3>Настройки</h3>
+            
+            <label>
+                Время работы (минуты):
+                <input type="number" id="work-time" min="1" max="60" value="25">
+            </label>
+            
+            <label>
+                Время перерыва (минуты):
+                <input type="number" id="break-time" min="1" max="30" value="5">
+            </label>
+            
+            <label>
+                <input type="checkbox" id="auto-start"> Автозапуск следующего периода
+            </label>
+            
+            <label>
+                <input type="checkbox" id="notifications"> Включить уведомления
+            </label>
+
+            <label>
+                <input type="checkbox" id="sounds"> Включить звуки
+            </label>
+
+            <label>
+                <input type="checkbox" id="show-games"> Показывать игры в перерывах
+            </label>
+
+            <label>
+                <input type="checkbox" id="dark-theme"> Темная тема
+            </label>
+            
+            <div class="modal-buttons">
+                <button onclick="saveSettings()">Сохранить</button>
+                <button onclick="closeModal('settings-modal')">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="stats-modal">
+        <div class="modal-content">
+            <h3>📊 Статистика</h3>
+            <div id="stats-content">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <h4>Сегодня</h4>
+                        <p class="stat-value" id="stat-today">0</p>
+                        <span>помидоров</span>
+                    </div>
+                    <div class="stat-item">
+                        <h4>Неделя</h4>
+                        <p class="stat-value" id="stat-week">0</p>
+                        <span>помидоров</span>
+                    </div>
+                    <div class="stat-item">
+                        <h4>Месяц</h4>
+                        <p class="stat-value" id="stat-month">0</p>
+                        <span>помидоров</span>
+                    </div>
+                    <div class="stat-item">
+                        <h4>Всего</h4>
+                        <p class="stat-value" id="stat-total">0</p>
+                        <span>помидоров</span>
+                    </div>
+                </div>
+                
+                <div class="stats-actions">
+                    <button onclick="exportStats()">📤 Экспорт</button>
+                    <button onclick="importStats()">📥 Импорт</button>
+                    <button onclick="clearStats()">🗑️ Очистить</button>
+                </div>
+                
+                <div class="stats-chart">
+                    <h4>Последние 7 дней</h4>
+                    <div id="chart-container"></div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button onclick="closeModal('stats-modal')">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="game-modal">
+        <div class="modal-content">
+            <h3>🎮 Время перерыва!</h3>
+            <div id="game-container">
+                <p>Отдохните и сыграйте в мини-игру!</p>
+                <div class="game-buttons">
+                    <button onclick="startGame('reaction')">🎯 Тест на реакцию</button>
+                    <button onclick="closeModal('game-modal')">✖️ Пропустить</button>
+                </div>
+                <div id="game-area" style="display: none; margin-top: 20px; text-align: center;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="update-modal">
+        <div class="modal-content">
+            <h3>🎉 Доступно обновление!</h3>
+            <p>Новая версия FocusTimer готова к установке.</p>
+            <div class="modal-buttons">
+                <button onclick="installUpdate()" class="pulse">🔄 Установить сейчас</button>
+                <button onclick="closeModal('update-modal')">Позже</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="update-notification" id="update-notification" style="display: none;">
+        <span>✅ Обновление загружено! Перезапустите приложение.</span>
+        <button onclick="installUpdate()">Перезапустить</button>
+    </div>
+    
+    <footer>
+        <p>FocusTimer © 2023 | Помогаем вам быть продуктивнее</p>
+        <p>Горячие клавиши: Space - пауза/старт, Esc - сброс</p>
+    </footer>
+
+    <script>
+        // Элементы DOM
+        const timerDisplay = document.getElementById('timer');
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const workModeBtn = document.getElementById('work-mode');
+        const breakModeBtn = document.getElementById('break-mode');
+        const completedCountEl = document.getElementById('completed-count');
+        const settingsBtn = document.getElementById('settings-btn');
+        const statsBtn = document.getElementById('stats-btn');
+        const themeBtn = document.getElementById('theme-btn');
+        const progressBar = document.getElementById('progress');
+    
+        // Переменные таймера
+        let workTime = 25 * 60;
+        let breakTime = 5 * 60;
+        let currentTime = workTime;
+        let currentMode = 'work';
+        let timerInterval = null;
+        let isRunning = false;
+        let completedPomodoros = 0;
+        let totalTime = workTime;
+    
+        // Настройки
+        let settings = {
+            workTime: 25,
+            breakTime: 5,
+            autoStart: true,
+            notifications: true,
+            sounds: true,
+            showGames: true,
+            darkTheme: true
+        };
+    
+        // Статистика
+        let statistics = {
+            daily: {},
+            total: 0,
+            streak: 0
+        };
+    
+        // ПРОСТАЯ СИСТЕМА ЗВУКОВ ЧЕРЕЗ HTML5 AUDIO
+        const soundCache = {};
+    
+        function loadSounds() {
+            // Создаем базовые звуки программно
+            try {
+                // Звук клика (короткий beep)
+                const clickSound = new Audio("data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbVtfdJivrJBhNjVgodDbq2EcBSt8t/LFjEMTACFoofDZnlMcACRmjM3UqHIoAB1UcLbJtJhKABhHYqO9tKb/AABSXJG2tLbT/wAARlGEsLbE2f8AADtIeK28xej/AAAwPnSru8js/wAAJTVxqrzM8/8AABsubKW6z/n/AAASJ2WhudL+/wAACR5enrna//8AAPwTWJq33v//AADyDlGXtOD//wAA6AhJlLLj//8AAOACRI+v5v//AADYAD+Kquj//wAA0AA5h6fp//8AAMgANYKk6v//AADAACh+n+z//wAAuAAie5zt//8AALAAHXeZ7v//AACoABh0k+///wAAoAAScI7w//8AAJgADWyJ8f//AACQAAdphfL//wAAiAACZ4Dz//8AAIA");
+                clickSound.volume = 0.3;
+                soundCache.click = clickSound;
+    
+                // Звук колокольчика (более длинный)
+                const bellSound = new Audio("data:audio/wav;base64,UklGRuQNAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YcAMAAAAjJmwrry8rJBhNjVgodDbq2EcBSt8t/LFjEMTACFoofDZnlMcACRmjM3UqHIoAB1UcLbJtJhKABhHYqO9tKb/AABSXJG2tLbT/wAARlGEsLbE2f8AADtIeK28xej/AAAwPnSru8js/wAAJTVxqrzM8/8AABsubKW6z/n/AAASJ2WhudL+/wAACR5enrna//8AAPwTWJq33v//AADyDlGXtOD//wAA6AhJlLLj//8AAOACRI+v5v//AADYAD+Kquj//wAA0AA5h6fp//8AAMgANYKk6v//AADAACh+n+z//wAAuAAie5zt//8AALAAHXeZ7v//AACoABh0k+///wAAoAAScI7w//8AAJgADWyJ8f//AACQAAdphfL//wAAiAACZ4Dz//8AAIA");
+                bellSound.volume = 0.4;
+                soundCache.bell = bellSound;
+    
+            } catch (error) {
+                console.log("Аудио контекст не доступен");
+            }
+        }
+    
+        // Функция воспроизведения звука
+        function playSound(soundName) {
+            if (!settings.sounds) return;
+            
+            try {
+                const sound = soundCache[soundName];
+                if (sound) {
+                    sound.currentTime = 0;
+                    sound.play().catch(error => {
+                        console.log("Ошибка воспроизведения звука:", error);
+                    });
+                }
+            } catch (error) {
+                console.log("Ошибка при воспроизведении звука:", error);
+            }
+        }
+    
+        // Функции таймера
+        function updateDisplay() {
+            const minutes = Math.floor(currentTime / 60);
+            const seconds = currentTime % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            const progressPercentage = ((totalTime - currentTime) / totalTime) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+    
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+                startBtn.textContent = 'Запущено';
+                playSound('click');
+                
+                timerInterval = setInterval(() => {
+                    if (currentTime > 0) {
+                        currentTime--;
+                        updateDisplay();
+                    } else {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        startBtn.disabled = false;
+                        pauseBtn.disabled = true;
+                        startBtn.textContent = 'Старт';
+                        
+                        playSound('bell');
+                        
+                        if (settings.notifications && window.electronAPI) {
+                            const title = currentMode === 'work' ? 'Время перерыва!' : 'Время работать!';
+                            const body = currentMode === 'work' ? 'Отдохните 5 минут' : 'Сосредоточьтесь на работе';
+                            window.electronAPI.showNotification(title, body);
+                        }
+                        
+                        if (currentMode === 'work') {
+                            completedPomodoros++;
+                            completedCountEl.textContent = completedPomodoros;
+                            saveStatistics();
+                            
+                            if (settings.showGames) {
+                                setTimeout(() => {
+                                    document.getElementById('game-modal').style.display = 'block';
+                                }, 1000);
+                            }
+                            
+                            switchMode('break');
+                        } else {
+                            switchMode('work');
+                        }
+                        
+                        if (settings.autoStart) {
+                            setTimeout(() => startTimer(), 1000);
+                        }
+                    }
+                }, 1000);
+            }
+        }
+    
+        function pauseTimer() {
+            if (isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+                startBtn.textContent = 'Продолжить';
+                playSound('click');
+            }
+        }
+    
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            startBtn.textContent = 'Старт';
+            currentTime = currentMode === 'work' ? workTime : breakTime;
+            totalTime = currentTime;
+            updateDisplay();
+            playSound('click');
+        }
+    
+        function switchMode(mode) {
+            currentMode = mode;
+            currentTime = mode === 'work' ? workTime : breakTime;
+            totalTime = currentTime;
+            
+            workModeBtn.classList.toggle('active', mode === 'work');
+            breakModeBtn.classList.toggle('active', mode === 'break');
+            workModeBtn.textContent = `Работа (${Math.floor(workTime/60)}:00)`;
+            breakModeBtn.textContent = `Перерыв (${Math.floor(breakTime/60)}:00)`;
+            
+            updateDisplay();
+            resetTimer();
+        }
+    
+        // Настройки
+        function loadSettings() {
+            const saved = localStorage.getItem('focusTimerSettings');
+            if (saved) {
+                settings = JSON.parse(saved);
+                workTime = settings.workTime * 60;
+                breakTime = settings.breakTime * 60;
+                
+                document.getElementById('work-time').value = settings.workTime;
+                document.getElementById('break-time').value = settings.breakTime;
+                document.getElementById('auto-start').checked = settings.autoStart;
+                document.getElementById('notifications').checked = settings.notifications;
+                document.getElementById('sounds').checked = settings.sounds;
+                document.getElementById('show-games').checked = settings.showGames;
+                document.getElementById('dark-theme').checked = settings.darkTheme;
+                
+                if (settings.darkTheme) {
+                    document.body.classList.remove('light-theme');
+                    themeBtn.textContent = '🌙';
+                } else {
+                    document.body.classList.add('light-theme');
+                    themeBtn.textContent = '☀️';
+                }
+                
+                switchMode(currentMode);
+            }
+        }
+    
+        function saveSettings() {
+            settings.workTime = parseInt(document.getElementById('work-time').value);
+            settings.breakTime = parseInt(document.getElementById('break-time').value);
+            settings.autoStart = document.getElementById('auto-start').checked;
+            settings.notifications = document.getElementById('notifications').checked;
+            settings.sounds = document.getElementById('sounds').checked;
+            settings.showGames = document.getElementById('show-games').checked;
+            settings.darkTheme = document.getElementById('dark-theme').checked;
+            
+            localStorage.setItem('focusTimerSettings', JSON.stringify(settings));
+            
+            workTime = settings.workTime * 60;
+            breakTime = settings.breakTime * 60;
+            
+            if (settings.darkTheme) {
+                document.body.classList.remove('light-theme');
+                themeBtn.textContent = '🌙';
+            } else {
+                document.body.classList.add('light-theme');
+                themeBtn.textContent = '☀️';
+            }
+            
+            switchMode(currentMode);
+            closeModal('settings-modal');
+            playSound('click');
+        }
+    
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            playSound('click');
+        }
+    
+        // Статистика
+        function loadStatistics() {
+            const saved = localStorage.getItem('focusTimerStatistics');
+            if (saved) {
+                statistics = JSON.parse(saved);
+                updateStatsDisplay();
+            }
+        }
+    
+        function saveStatistics() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            if (!statistics.daily[today]) {
+                statistics.daily[today] = 0;
+            }
+            
+            statistics.daily[today]++;
+            statistics.total++;
+            
+            localStorage.setItem('focusTimerStatistics', JSON.stringify(statistics));
+            updateStatsDisplay();
+        }
+    
+        function updateStatsDisplay() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayCount = statistics.daily[today] || 0;
+            
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            
+            const monthAgo = new Date();
+            monthAgo.setDate(monthAgo.getDate() - 30);
+            
+            let weekCount = 0;
+            let monthCount = 0;
+            
+            Object.entries(statistics.daily).forEach(([date, count]) => {
+                const currentDate = new Date(date);
+                if (currentDate >= weekAgo) weekCount += count;
+                if (currentDate >= monthAgo) monthCount += count;
+            });
+            
+            document.getElementById('stat-today').textContent = todayCount;
+            document.getElementById('stat-week').textContent = weekCount;
+            document.getElementById('stat-month').textContent = monthCount;
+            document.getElementById('stat-total').textContent = statistics.total;
+            
+            // График
+            const chartContainer = document.getElementById('chart-container');
+            chartContainer.innerHTML = '';
+            
+            const last7Days = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                last7Days.push({
+                    date: dateStr,
+                    count: statistics.daily[dateStr] || 0
+                });
+            }
+            
+            const maxCount = Math.max(...last7Days.map(d => d.count), 1);
+            
+            last7Days.forEach(day => {
+                const height = (day.count / maxCount) * 100;
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                bar.style.height = `${height}px`;
+                bar.title = `${day.date}: ${day.count} помидоров`;
+                chartContainer.appendChild(bar);
+            });
+        }
+    
+        async function exportStats() {
+            try {
+                if (window.electronAPI) {
+                    const success = await window.electronAPI.exportStats(statistics);
+                    if (success) {
+                        alert('Статистика успешно экспортирована!');
+                    }
+                } else {
+                    const dataStr = JSON.stringify(statistics, null, 2);
+                    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                    const link = document.createElement('a');
+                    link.setAttribute('href', dataUri);
+                    link.setAttribute('download', `focus-timer-stats.json`);
+                    link.click();
+                }
+                playSound('click');
+            } catch (error) {
+                alert('Ошибка при экспорте: ' + error.message);
+            }
+        }
+    
+        async function importStats() {
+            if (confirm('Вы уверены? Текущая статистика будет заменена.')) {
+                try {
+                    if (window.electronAPI) {
+                        const data = await window.electronAPI.importStats();
+                        if (data) {
+                            statistics = data;
+                            localStorage.setItem('focusTimerStatistics', JSON.stringify(statistics));
+                            updateStatsDisplay();
+                            alert('Статистика успешно импортирована!');
+                        }
+                    }
+                    playSound('click');
+                } catch (error) {
+                    alert('Ошибка при импорте: ' + error.message);
+                }
+            }
+        }
+    
+        function clearStats() {
+            if (confirm('Вы уверены? Вся статистика будет удалена безвозвратно.')) {
+                statistics = { daily: {}, total: 0, streak: 0 };
+                localStorage.setItem('focusTimerStatistics', JSON.stringify(statistics));
+                updateStatsDisplay();
+                playSound('click');
+            }
+        }
+    
+        // Мини-игры
+        function startGame(type) {
+            const gameArea = document.getElementById('game-area');
+            gameArea.style.display = 'block';
+            gameArea.innerHTML = '';
+            
+            if (type === 'reaction') {
+                gameArea.innerHTML = `
+                    <p>Нажми, когда круг станет зеленым!</p>
+                    <div style="width: 100px; height: 100px; background: red; border-radius: 50%; margin: 20px auto; cursor: pointer;" 
+                         onclick="checkReaction(this)" id="reaction-circle"></div>
+                    <p id="reaction-time">Время реакции: 0ms</p>
+                `;
+                
+                setTimeout(() => {
+                    const circle = document.getElementById('reaction-circle');
+                    circle.style.background = 'green';
+                    window.gameStartTime = Date.now();
+                }, Math.random() * 3000 + 1000);
+            }
+        }
+    
+        function checkReaction(circle) {
+            if (circle.style.background === 'green') {
+                const reactionTime = Date.now() - window.gameStartTime;
+                document.getElementById('reaction-time').textContent = `Время реакции: ${reactionTime}ms`;
+                circle.style.background = 'blue';
+                playSound('click');
+            }
+        }
+    
+        // Темная тема
+        function toggleTheme() {
+            settings.darkTheme = !settings.darkTheme;
+            document.getElementById('dark-theme').checked = settings.darkTheme;
+            
+            if (settings.darkTheme) {
+                document.body.classList.remove('light-theme');
+                themeBtn.textContent = '🌙';
+            } else {
+                document.body.classList.add('light-theme');
+                themeBtn.textContent = '☀️';
+            }
+            
+            localStorage.setItem('focusTimerSettings', JSON.stringify(settings));
+            playSound('click');
+        }
+    
+        // Обновления
+        function installUpdate() {
+            if (window.electronAPI) {
+                window.electronAPI.restartApp();
+            }
+        }
+    
+        function checkForUpdates() {
+            if (window.electronAPI) {
+                window.electronAPI.checkForUpdates();
+            }
+        }
+    
+        // Инициализация
+        function init() {
+            loadSettings();
+            loadStatistics();
+            loadSounds(); // Загружаем звуки
+            
+            // Обработчики событий
+            startBtn.addEventListener('click', startTimer);
+            pauseBtn.addEventListener('click', pauseTimer);
+            resetBtn.addEventListener('click', resetTimer);
+            workModeBtn.addEventListener('click', () => switchMode('work'));
+            breakModeBtn.addEventListener('click', () => switchMode('break'));
+            settingsBtn.addEventListener('click', () => {
+                document.getElementById('settings-modal').style.display = 'block';
+                playSound('click');
+            });
+            statsBtn.addEventListener('click', () => {
+                document.getElementById('stats-modal').style.display = 'block';
+                updateStatsDisplay();
+                playSound('click');
+            });
+            themeBtn.addEventListener('click', toggleTheme);
+            
+            // Горячие клавиши
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    if (isRunning) {
+                        pauseTimer();
+                    } else {
+                        startTimer();
+                    }
+                }
+                
+                if (e.code === 'Escape') {
+                    resetTimer();
+                }
+                
+                if (e.code === 'KeyS' && e.ctrlKey) {
+                    e.preventDefault();
+                    document.getElementById('settings-modal').style.display = 'block';
+                    playSound('click');
+                }
+            });
+            
+            // Закрытие модальных окон
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        closeModal(modal.id);
+                    }
+                });
+            });
+            
+            // Обработчик сообщений из system tray
+            if (window.electronAPI) {
+                window.electronAPI.onToggleTimer(() => {
+                    if (isRunning) {
+                        pauseTimer();
+                    } else {
+                        startTimer();
+                    }
+                });
+                
+                window.electronAPI.onUpdateAvailable(() => {
+                    document.getElementById('update-modal').style.display = 'block';
+                });
+                
+                window.electronAPI.onUpdateDownloaded(() => {
+                    document.getElementById('update-notification').style.display = 'flex';
+                });
+            }
+            
+            updateDisplay();
+            
+            // Запрос разрешения на уведомления
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+    
+        // Запуск инициализации
+        init();
+    </script>
