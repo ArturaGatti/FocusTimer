@@ -9,12 +9,11 @@ let appIsQuitting = false;
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 500,
-    height: 600,
+    height: 650,
     resizable: false,
     webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js')
+      nodeIntegration: true,
+      contextIsolation: false
     },
     show: false,
     icon: path.join(__dirname, 'assets', 'icon.png')
@@ -141,6 +140,34 @@ ipcMain.on('restart_app', () => {
 ipcMain.on('check_for_updates', () => {
   // Заглушка для будущих обновлений
   mainWindow.webContents.send('update_available');
+});
+
+// Новые обработчики для файлов
+ipcMain.handle('select-file', async (event, options) => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openFile'],
+    filters: options.filters
+  });
+  
+  if (!result.canceled && result.filePaths.length > 0) {
+    return result.filePaths[0];
+  }
+  return null;
+});
+
+ipcMain.handle('save-file', async (event, content, defaultName) => {
+  const result = await dialog.showSaveDialog(mainWindow, {
+    defaultPath: defaultName,
+    filters: [
+      { name: 'JSON Files', extensions: ['json'] }
+    ]
+  });
+  
+  if (!result.canceled) {
+    fs.writeFileSync(result.filePath, content);
+    return true;
+  }
+  return false;
 });
 
 app.whenReady().then(() => {

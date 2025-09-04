@@ -1,44 +1,43 @@
 {
-  "name": "focus-timer",
-  "version": "1.0.0",
-  "description": "Простой и элегантный таймер Pomodoro для повышения продуктивности",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron .",
-    "build": "electron-builder --win --publish never",
-    "dist": "npm run build",
-    "publish": "electron-builder --win --publish always"
-  },
-  "author": "FocusTimer Team",
-  "license": "MIT",
-  "devDependencies": {
-    "electron": "^28.0.0",
-    "electron-builder": "^24.0.0"
-  },
-  "build": {
-    "appId": "com.focustimer.app",
-    "productName": "FocusTimer",
-    "directories": {
-      "output": "dist"
+    
+    "name": "focustimer-premium",
+    "version": "2.0.0",
+    "description": "Focus Timer with Premium Features",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "build": "electron-builder",
+        "dist": "electron-builder --publish=never"
     },
-    "files": [
-      "**/*",
-      "!**/*.md",
-      "!**.log",
-      "!dist/**",
-      "!.git/**",
-      "!.vscode/**"
-    ],
-    "win": {
-      "target": "nsis",
-      "icon": "assets/icon.ico"
+    "author": "Your Name",
+    "license": "MIT",
+    "devDependencies": {
+        "electron": "^22.0.0",
+        "electron-builder": "^23.6.0"
     },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "FocusTimer"
+    "build": {
+        "appId": "com.yourcompany.focustimer",
+        "productName": "FocusTimer Premium",
+        "directories": {
+            "output": "dist"
+        },
+        "files": [
+            "**/*",
+            "!node_modules",
+            "!dist"
+        ],
+        "win": {
+            "target": "nsis",
+            "icon": "assets/icon.ico"
+        },
+        "mac": {
+            "target": "dmg",
+            "icon": "assets/icon.icns"
+        },
+        "linux": {
+            "target": "AppImage",
+            "icon": "assets/icon.png"
+        }
+        
     }
   }
-}
